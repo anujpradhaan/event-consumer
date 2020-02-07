@@ -1,6 +1,6 @@
 package com.eventchase.consumer.confiugration;
 
-import com.eventchase.consumer.RequestDTO;
+import com.eventchase.consumer.Order;
 import lombok.Data;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -10,7 +10,6 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.ClassMapper;
 import org.springframework.amqp.support.converter.DefaultClassMapper;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
@@ -52,7 +51,7 @@ public class RabbitMQConsumerConfiguration {
 	{
 		DefaultClassMapper classMapper = new DefaultClassMapper();
 		Map<String, Class<?>> idClassMapping = new HashMap<>();
-		idClassMapping.put("com.eventchase.producer.exchange.RequestDTO", RequestDTO.class);
+		idClassMapping.put("com.eventchase.producer.exchange.Order", Order.class);
 		classMapper.setIdClassMapping(idClassMapping);
 		return classMapper;
 	}
@@ -106,7 +105,7 @@ public class RabbitMQConsumerConfiguration {
 	@Configuration
 	public class FanoutExchangeConfig {
 		@Bean
-		public FanoutExchange getFanoutExchange() {
+		public FanoutExchange getFanoutExchange1() {
 			return new FanoutExchange(getFanoutExchangeConfig().getExchangeName());
 		}
 
@@ -118,7 +117,7 @@ public class RabbitMQConsumerConfiguration {
 		@Bean
 		Binding getFanoutQueueBinding() {
 			return BindingBuilder.bind(getFanoutQueue())
-					.to(getFanoutExchange());
+					.to(getFanoutExchange1());
 		}
 	}
 }
