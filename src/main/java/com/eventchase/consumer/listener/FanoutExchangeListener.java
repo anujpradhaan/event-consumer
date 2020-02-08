@@ -13,8 +13,18 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class FanoutExchangeListener {
 
-	@RabbitListener(queues = { "fanout-queue" })
+	@RabbitListener(queues = { "fanout-queue1" })
 	public void receiveMessageFromQueue1(Order order, Message message) {
-		log.info("Received Message {} from queue {}", order, message.getMessageProperties().getConsumerQueue());
+		log.info("Queue {} Received on Message {}", message.getMessageProperties().getConsumerQueue(), order);
+	}
+
+	@RabbitListener(queues = { "fanout-queue2" })
+	public void receiveMessageFromQueue2(Order order, Message message) {
+		log.info("Queue {} Received on Message {}", message.getMessageProperties().getConsumerQueue(), order);
+	}
+
+	@RabbitListener(queues = { "fanout-queue3" })
+	public void receiveMessageFromQueue3(Order order, Message message) {
+		log.info("Queue {} Received on Message {}", message.getMessageProperties().getConsumerQueue(), order);
 	}
 }

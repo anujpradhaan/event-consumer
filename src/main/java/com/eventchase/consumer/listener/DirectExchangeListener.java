@@ -14,6 +14,6 @@ public class DirectExchangeListener {
 
 	@RabbitListener(queues = { "direct-queue" })
 	public void receiveMessage(Order order, Message message) {
-		log.info("Received Message {} from queue {}", order, message.getMessageProperties().getConsumerQueue());
+		log.info("Queue {} Received on Message {}", message.getMessageProperties().getConsumerQueue(), order);
 	}
 }

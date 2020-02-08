@@ -13,4 +13,6 @@ rabbitmq:
     routingKey: routing.key
   fanoutExchangeConfig:
     exchangeName: fanout-exchange
-    queueName: fanout-queue
+    queue1: fanout-queue1
+    queue2: fanout-queue2
+    queue3: fanout-queue3

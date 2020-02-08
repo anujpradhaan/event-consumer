@@ -2,8 +2,8 @@ package com.eventchase.consumer.confiugration;
 
 import com.eventchase.consumer.Order;
 import lombok.Data;
-import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.Declarables;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
@@ -30,13 +30,21 @@ public class RabbitMQConsumerConfiguration {
 	private int port;
 	private ExchangeConfig topicExchangeConfig;
 	private ExchangeConfig directExchangeConfig;
-	private ExchangeConfig fanoutExchangeConfig;
+	private FanoutExchangeConfig fanoutExchangeConfig;
 
 	@Data
 	private static class ExchangeConfig {
 		private String exchangeName;
 		private String queueName;
 		private String routingKey;
+	}
+
+	@Data
+	private static class FanoutExchangeConfig {
+		private String exchangeName;
+		private String queue1;
+		private String queue2;
+		private String queue3;
 	}
 
 	@Bean
@@ -47,8 +55,7 @@ public class RabbitMQConsumerConfiguration {
 	}
 
 	@Bean
-	public DefaultClassMapper getClassMapper()
-	{
+	public DefaultClassMapper getClassMapper() {
 		DefaultClassMapper classMapper = new DefaultClassMapper();
 		Map<String, Class<?>> idClassMapping = new HashMap<>();
 		idClassMapping.put("com.eventchase.producer.exchange.Order", Order.class);
@@ -62,62 +69,43 @@ public class RabbitMQConsumerConfiguration {
 		return rabbitTemplate;
 	}
 
-	@Configuration
-	public class TopicExchangeConfiguration {
-		@Bean
-		TopicExchange getTopicExchange() {
-			return new TopicExchange(getTopicExchangeConfig().getExchangeName());
-		}
-
-		@Bean
-		Queue getTopicQueue() {
-			return new Queue(getTopicExchangeConfig().getQueueName());
-		}
-
-		@Bean
-		Binding getTopicQueueBinding() {
-			return BindingBuilder.bind(getTopicQueue())
-					.to(getTopicExchange())
-					.with(getTopicExchangeConfig().getRoutingKey());
-		}
+	@Bean
+	Declarables bindTopicQueue() {
+		TopicExchange topicExchange = new TopicExchange(getTopicExchangeConfig().getExchangeName());
+		Queue queue = new Queue(getTopicExchangeConfig().getQueueName());
+		return new Declarables(topicExchange, queue,
+				BindingBuilder.bind(queue)
+						.to(topicExchange)
+						.with(getTopicExchangeConfig().getRoutingKey())
+		);
 	}
 
-	@Configuration
-	public class DirectExchangeConfig {
-		@Bean
-		public DirectExchange getDirectExchange() {
-			return new DirectExchange(getDirectExchangeConfig().getExchangeName());
-		}
-
-		@Bean
-		Queue getDirectQueue() {
-			return new Queue(getDirectExchangeConfig().getQueueName());
-		}
-
-		@Bean
-		Binding getDirectQueueBinding() {
-			return BindingBuilder.bind(getDirectQueue())
-					.to(getDirectExchange())
-					.with(getDirectExchangeConfig().getRoutingKey());
-		}
+	@Bean
+	Declarables bindDirectQueue() {
+		DirectExchange directExchange = new DirectExchange(getDirectExchangeConfig().getExchangeName());
+		Queue queue = new Queue(getDirectExchangeConfig().getQueueName());
+		return new Declarables(directExchange, queue, BindingBuilder.bind(queue)
+				.to(directExchange)
+				.with(getDirectExchangeConfig().getRoutingKey())
+		);
 	}
 
-	@Configuration
-	public class FanoutExchangeConfig {
-		@Bean
-		public FanoutExchange getFanoutExchange1() {
-			return new FanoutExchange(getFanoutExchangeConfig().getExchangeName());
-		}
-
-		@Bean
-		Queue getFanoutQueue() {
-			return new Queue(getFanoutExchangeConfig().getQueueName());
-		}
-
-		@Bean
-		Binding getFanoutQueueBinding() {
-			return BindingBuilder.bind(getFanoutQueue())
-					.to(getFanoutExchange1());
-		}
+	@Bean
+	Declarables bindFanoutQueues() {
+		FanoutExchange fanoutExchange = new FanoutExchange(getFanoutExchangeConfig().getExchangeName());
+		Queue queue1 = new Queue(getFanoutExchangeConfig().getQueue1());
+		Queue queue2 = new Queue(getFanoutExchangeConfig().getQueue2());
+		Queue queue3 = new Queue(getFanoutExchangeConfig().getQueue3());
+		return new Declarables(fanoutExchange,
+				queue1,
+				queue2,
+				queue3,
+				BindingBuilder.bind(queue1)
+						.to(fanoutExchange),
+				BindingBuilder.bind(queue2)
+						.to(fanoutExchange),
+				BindingBuilder.bind(queue3)
+						.to(fanoutExchange)
+		);
 	}
 }
