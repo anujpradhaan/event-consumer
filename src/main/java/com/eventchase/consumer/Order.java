@@ -11,25 +11,25 @@ public class Order {
 	private Recipient recipient;
 
 	@Data
-	private static class Product {
+	public static class Product {
 		private String name;
 		private Double price;
 	}
 
 	@Data
-	private static class Recipient {
+	public static class Recipient {
 		private BasicUserProfile basicProfile;
 		private List<Address> addresses;
 
 		@Data
-		private static class BasicUserProfile {
+		public static class BasicUserProfile {
 			private String name;
 			private String phoneNumber;
 			private String email;
 		}
 
 		@Data
-		private static class Address {
+		public static class Address {
 			private AddressType addressType;
 			private String line1;
 			private String line2;

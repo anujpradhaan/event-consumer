@@ -8,6 +8,7 @@ import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.DefaultClassMapper;
@@ -48,6 +49,16 @@ public class RabbitMQConsumerConfiguration {
 	}
 
 	@Bean
+	public ConnectionFactory getConnectionFactory() {
+		CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory();
+		cachingConnectionFactory.setAddresses(getHost());
+		cachingConnectionFactory.setPort(getPort());
+		cachingConnectionFactory.setUsername(getUsername());
+		cachingConnectionFactory.setPassword(getPassword());
+		return cachingConnectionFactory;
+	}
+
+	@Bean
 	MessageConverter getJsonMessageConverter() {
 		Jackson2JsonMessageConverter jackson2JsonMessageConverter = new Jackson2JsonMessageConverter();
 		jackson2JsonMessageConverter.setClassMapper(getClassMapper());
@@ -58,7 +69,7 @@ public class RabbitMQConsumerConfiguration {
 	public DefaultClassMapper getClassMapper() {
 		DefaultClassMapper classMapper = new DefaultClassMapper();
 		Map<String, Class<?>> idClassMapping = new HashMap<>();
-		idClassMapping.put("com.eventchase.producer.exchange.Order", Order.class);
+		idClassMapping.put("com.eventchase.producer.entity.Orders", Order.class);
 		classMapper.setIdClassMapping(idClassMapping);
 		return classMapper;
 	}
